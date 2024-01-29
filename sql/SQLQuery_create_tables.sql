@@ -183,6 +183,18 @@ where fact_sales.sku = dim_products.sku
 group by dim_products.sku
 order by sum(quantitySold) desc
 
-select * from fact_sales
+select TOP 100 * from fact_sales
 
 select * from dim_products
+
+select * from dim_department
+
+select column_name FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'dim_products';
+
+SELECT TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'bestbuyDataWarehouse';
+
+select * from dim_date
+where month(saleDate) = 2
