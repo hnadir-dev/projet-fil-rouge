@@ -20,6 +20,7 @@ default_args = {
 
 connection_string_stg = "mssql+pyodbc://Admin:admin1234@192.168.56.1/bestbuyStagingAreadb?driver=ODBC+Driver+17+for+SQL+Server"
 connection_string_dw = "mssql+pyodbc://Admin:admin1234@192.168.56.1/bestbuyDataWarehouse?driver=ODBC+Driver+17+for+SQL+Server"
+connection_string_dMart = "mssql+pyodbc://Admin:admin1234@192.168.56.1/bestbuyDataMart?driver=ODBC+Driver+17+for+SQL+Server"
 
 # Create the SQLAlchemy Engine
 engine = create_engine(connection_string_stg)
@@ -247,7 +248,37 @@ def runDataTransformation():
                 table_df.to_sql(table_name, con=engine_dw, if_exists='append', index=False) #SCD 2 : Création d'une nouvelle ligne
             except:
                 pass
-            
+        
+        #--------------------------------------------------------------------+
+        #                               Data Mart                            #
+        #--------------------------------------------------------------------+
+
+        engine_dMart = create_engine(connection_string_dMart)
+
+        df_m_products = df_products[['sku','name','startDate','new','active','activeUpdateDate','priceUpdateDate','digital',
+                                     'preowned','url','productTemplate','freeShipping','specialOrder','mpaaRating','image',
+                                     'shortDescription','condition','customerTopRated','customerTopRated','customerReviewCount',
+                                     'customerReviewAverage','departmentID']]
+        
+        fact_dimension_mart_tables = {
+            'dim_department': df_department,
+            #
+            'dim_products': df_m_products,
+            #
+            'dim_customers': df_customers,
+            #
+            'dim_date': df_date,
+            #
+            'dim_paymentMethod': df_payment,
+            #Fact table
+            'fact_sales': df_sales
+        }
+
+        for table_name, table_df in fact_dimension_mart_tables.items():
+            try:
+                table_df.to_sql(table_name, con=engine_dMart, if_exists='append', index=False) #SCD 2 : Création d'une nouvelle ligne
+            except:
+                pass
         #debug
         #subprocess.run(f'touch /mnt/c/users/youcode/desktop/projet-fil-rouge/dags/data_inserted_with_successfuly.txt', shell=True)
 
