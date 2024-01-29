@@ -53,12 +53,11 @@ with engine.connect() as connection:
             product_details['customuerEmail'] = faker.email()
             product_details['customerCountry'] = faker.country()
             location = geolocator.geocode(faker.country())
-            product_details['location'] = dict(lat=location.latitude, lon=location.longitude)
-            # if location:
-            #     # product_details['location'] = {"lat": location.latitude, "lon": location.longitude}
-            #     product_details['location'] = (location.latitude, location.longitude)
-            # else:
-            #     product_details['location'] = (0,0)
+            if location:
+                product_details['location'] = dict(lat=location.latitude, lon=location.longitude)
+            else:
+                product_details['location'] = (0,0)
+
             #Sale info :
             # current dateTime
             now = datetime.now()
@@ -86,4 +85,4 @@ with engine.connect() as connection:
         else:
             print('Error fetching...')
             
-        time.sleep(2)
+        time.sleep(4)
